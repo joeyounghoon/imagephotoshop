@@ -1,7 +1,6 @@
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageEnhance
 import openai
-import io
 
 def generate_edit_instructions(api_key, prompt):
     openai.api_key = api_key
@@ -13,9 +12,28 @@ def generate_edit_instructions(api_key, prompt):
     return response.choices[0].text.strip()
 
 def edit_image(image, instructions):
-    # Pillow를 사용하여 이미지 편집 로직 구현 (예: 밝기 조정, 자르기 등)
-    # 이 예시는 단순히 원본 이미지를 반환합니다
-    return image
+    # 기본적인 이미지 편집 예시
+    instructions = instructions.lower()
+    edited_image = image
+
+    if "brightness" in instructions:
+        factor = 1.5  # 기본 밝기 증가 배율
+        if "increase" in instructions:
+            factor = 1.5
+        elif "decrease" in instructions:
+            factor = 0.5
+        enhancer = ImageEnhance.Brightness(edited_image)
+        edited_image = enhancer.enhance(factor)
+
+    if "crop" in instructions:
+        width, height = edited_image.size
+        left = width * 0.1
+        top = height * 0.1
+        right = width * 0.9
+        bottom = height * 0.9
+        edited_image = edited_image.crop((left, top, right, bottom))
+
+    return edited_image
 
 # Streamlit 파일 업로드 및 프롬프트 입력
 st.title("AI 포토샵 웹앱")
