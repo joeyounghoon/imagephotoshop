@@ -4,7 +4,7 @@ import openai
 
 def generate_edit_instructions(api_key, prompt):
     openai.api_key = api_key
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-4-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant that generates image editing instructions."},
