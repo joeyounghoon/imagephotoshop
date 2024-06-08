@@ -4,12 +4,15 @@ import openai
 
 def generate_edit_instructions(api_key, prompt):
     openai.api_key = api_key
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"사용자의 프롬프트를 참고하여 이미지 편집 지침을 생성하세요: {prompt}",
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates image editing instructions."},
+            {"role": "user", "content": prompt}
+        ],
         max_tokens=150
     )
-    return response.choices[0].text.strip()
+    return response.choices[0].message['content'].strip()
 
 def edit_image(image, instructions):
     # 기본적인 이미지 편집 예시
