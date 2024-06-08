@@ -15,7 +15,7 @@ def generate_edit_instructions(api_key, prompt):
         stop=None,
         temperature=0.5
     )
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content
 
 def edit_image(image, instructions):
     instructions = instructions.lower()
