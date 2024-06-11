@@ -14,15 +14,16 @@ user_input = st.text_input("Enter your query:")
 # API 호출 함수 정의
 def get_openai_response(api_key, prompt):
     openai.api_key = api_key
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # 또는 사용할 다른 엔진
-        prompt=prompt,
-        max_tokens=150,  # 응답의 최대 토큰 수 설정
-        n=1,  # 하나의 응답 생성
-        stop=None,  # 지정된 토큰에서 멈춤
-        temperature=0.7  # 응답의 창의성 조절 (0.0 ~ 1.0)
+    response = client.chat.completions.create(
+      model="gpt-3.5-turbo",
+      messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Who won the world series in 2020?"},
+        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+        {"role": "user", "content": "Where was it played?"}
+      ]
     )
-    return response.choices[0].text.strip()
+    return completion.choices[0].message.content
 
 # 버튼 클릭 시 응답 표시
 if st.button("Get Response"):
