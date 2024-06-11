@@ -14,7 +14,7 @@ def get_openai_response(api_key, messages):
     )
     
     # 응답 텍스트 반환
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()
 
 # Streamlit 애플리케이션 설정
 st.title("OpenAI API Assistant Bot")
@@ -28,7 +28,7 @@ initial_messages = [
 ]
 
 # 이전 메시지와 사용자 입력을 포함한 전체 메시지 리스트
-messages = initial_messages
+messages = initial_messages.copy()
 
 # 사용자 입력 받기
 user_input = st.text_input("Enter your query:")
