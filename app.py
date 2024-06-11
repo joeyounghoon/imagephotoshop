@@ -9,7 +9,7 @@ def get_openai_response(api_key, messages):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages,
-        max_tokens=150,  # 응답의 최대 토큰 수 설정
+        max_tokens=1500,  # 응답의 최대 토큰 수 설정
         temperature=0.7  # 응답의 창의성 조절 (0.0 ~ 1.0)
     )
     
