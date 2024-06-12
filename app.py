@@ -1,22 +1,43 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
+import librosa
+import librosa.display
+import numpy as np
+import matplotlib.pyplot as plt
 
-def get_opgg_data(summoner_name):
-    url = f'https://www.op.gg/summoners/kr/%EC%A4%91%EC%84%B1%EB%A7%88%EB%85%80%20%EC%A3%A0%EB%A7%88-KR1'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
+st.title('MP3 파일 음성 분석')
+
+# 파일 업로드
+uploaded_file = st.file_uploader("MP3 파일을 업로드하세요", type=["mp3"])
+
+if uploaded_file is not None:
+    # librosa를 사용하여 오디오 파일 읽기
+    y, sr = librosa.load(uploaded_file, sr=None)
     
-    # 필요한 데이터를 추출하는 로직을 여기에 작성합니다.
-    # 예: 최근 경기 데이터, KDA, 승률 등
-    # 이 예제에서는 간단히 페이지 제목을 추출합니다.
-    title = soup.title.string
+    # 시간에 따른 파형 그리기
+    st.header('파형')
+    fig, ax = plt.subplots()
+    librosa.display.waveshow(y, sr=sr, ax=ax)
+    plt.xlabel('시간 (s)')
+    plt.ylabel('진폭')
+    st.pyplot(fig)
     
-    return title
-
-st.title('OP.GG Summoner Lookup')
-
-summoner_name = st.text_input('Enter Summoner Name:')
-if summoner_name:
-    data = get_opgg_data(summoner_name)
-    st.write(f'Data for {summoner_name}: {data}')
+    # 시간에 따른 음성 주파수 스펙트로그램 그리기
+    st.header('스펙트로그램')
+    fig, ax = plt.subplots()
+    S = librosa.feature.melspectrogram(y, sr=sr)
+    S_dB = librosa.power_to_db(S, ref=np.max)
+    img = librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel', ax=ax)
+    fig.colorbar(img, ax=ax, format='%+2.0f dB')
+    plt.xlabel('시간 (s)')
+    plt.ylabel('주파수 (Hz)')
+    st.pyplot(fig)
+    
+    # 시간에 따른 음성 주파수 특징 추출 및 시각화
+    st.header('주파수 특징')
+    chroma_stft = librosa.feature.chroma_stft(y=y, sr=sr)
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(chroma_stft, y_axis='chroma', x_axis='time', ax=ax)
+    fig.colorbar(img, ax=ax)
+    plt.xlabel('시간 (s)')
+    plt.ylabel('주파수 (Hz)')
+    st.pyplot(fig)
