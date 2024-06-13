@@ -3,15 +3,31 @@ import librosa
 import librosa.display
 import numpy as np
 import matplotlib.pyplot as plt
+from pydub import AudioSegment
+import tempfile
 
 st.title('MP3 파일 음성 분석')
 
 # 파일 업로드
-uploaded_file = st.file_uploader("MP3 파일을 업로드하세요", type=["mp3"])
+uploaded_file = st.file_uploader("MP3 또는 MP4 파일을 업로드하세요", type=["mp3", "mp4"])
 
 if uploaded_file is not None:
+    file_extension = uploaded_file.name.split('.')[-1].lower()
+    
+    # 파일을 임시 파일로 저장
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as temp_file:
+        temp_file.write(uploaded_file.read())
+        temp_file_path = temp_file.name
+    
+    if file_extension == 'mp4':
+        # MP4 파일을 MP3로 변환
+        audio = AudioSegment.from_file(temp_file_path, format="mp4")
+        mp3_temp_file_path = temp_file_path.replace('.mp4', '.mp3')
+        audio.export(mp3_temp_file_path, format="mp3")
+        temp_file_path = mp3_temp_file_path
+
     # librosa를 사용하여 오디오 파일 읽기
-    y, sr = librosa.load(uploaded_file, sr=None)
+    y, sr = librosa.load(temp_file_path, sr=None)
     
     # 시간에 따른 파형 그리기
     st.header('파형')
